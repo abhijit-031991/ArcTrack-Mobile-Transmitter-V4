@@ -1,18 +1,25 @@
 #include <Arduino.h>
+#include <SPI.h>
 
-// put function declarations here:
-int myFunction(int, int);
+void blinkLed(int bw, int pause){
+  digitalToggle(PA10);
+  delay(bw);
+  digitalToggle(PA10);
+  delay(pause);
+}
 
 void setup() {
   // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  SerialUSB.begin(115200);
+  SerialUSB.println("ArcTrack-Mobile-transmitter");
+  pinMode(PA10, OUTPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  blinkLed(500, 500);  
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
+
+
+
