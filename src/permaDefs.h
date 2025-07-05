@@ -6,3 +6,31 @@ const char* tagID = "ArcTrack-Yagi-120";
 #define SS      PA4   // GPIO18 -- SX1278's CS
 #define RST     PA1   // GPIO14 -- SX1278's RESET
 #define DI0     PA2   // GPIO26 -- SX1278's IRQ(Interrupt Request)
+#define LED     PA10
+
+struct data{
+    uint32_t datetime;
+    uint16_t locktime;
+    float lat;
+    float lng;
+    byte hdop;
+    // byte id;
+};
+
+struct settings{
+        uint16_t gpsFrq;
+        uint16_t gpsTout;
+        uint8_t hdop;
+        uint8_t radioFrq;
+      } __attribute__((__packed__));
+
+struct reqPing{
+    uint16_t tag;
+    byte request;
+  };
+
+struct resPing{
+    uint16_t tag;
+    byte resp;
+  };
+    
