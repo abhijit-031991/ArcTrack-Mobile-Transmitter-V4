@@ -18,6 +18,7 @@ BLECharacteristic pingCharacteristic("c4850de5-2ca0-464b-8e4a-ae45ad4460b7", BLE
 BLECharacteristic dataCharacteristic("9e150970-35ad-400c-b46d-08ed71f07709", BLERead | BLEWrite | BLENotify,(const int)128, false);
 BLECharacteristic metaData("a0fa056d-716d-42cd-bfd6-f48c72e2cbe6", BLERead | BLEWrite | BLENotify,(const int)128, false);
 
+
 void blinkLed(int bw, int pause){
   digitalToggle(PA10);
   delay(bw);
@@ -71,7 +72,7 @@ void loop() {
   if (central) {
     digitalWrite(PA10, HIGH);
     SerialUSB.print("Connected to central: ");
-    // print the central's MAC address:
+    // // print the central's MAC address:
     SerialUSB.println(central.address());
     // while the central is still connected to peripheral:
     while (central.connected()) {
@@ -80,7 +81,7 @@ void loop() {
       {
         SerialUSB.println(x);
       }
-      if (x == 3)  /// Universal Request Ping - Request/Response
+      if (x == 3)  /// Request/Response
       {
         char dat[128];
         struct resp{
@@ -98,38 +99,10 @@ void loop() {
         doc[F("RSSI")] = LoRa.packetRssi();
         serializeJson(doc, dat);
 
-        pingCharacteristic.writeValue(dat);
-        SerialUSB.println(dat);
-      }
-      if (x == 13) /// DevType 101/105/107 - Ping
-      {
-        SerialUSB.println(F("Received Ping"));
-        char dat[128];
-        struct ping{
-          uint16_t ta;
-          uint16_t cnt;
-          float la;
-          float ln;
-          uint8_t devtyp;
-        } __attribute__((__packed__)) p;
-
-        while (LoRa.available())
-        {
-          LoRa.readBytes((uint8_t*)&p, x);
-        }
-
-        StaticJsonDocument<256> doc;
-        doc[F("ID")] = p.ta;
-        doc[F("Lat")] = String(p.la, 6);
-        doc[F("Lng")] = String(p.ln, 6);
-        doc[F("DTyp")] = p.devtyp;
-        doc[F("cnt")] = p.cnt;
-        doc[F("RSSI")] = LoRa.packetRssi();
-        serializeJson(doc, dat);
-        pingCharacteristic.writeValue(dat);
+        pingCharacteristic.writeValue(dat); 
         SerialUSB.println(dat);
       } 
-      if (x == 14) /// DevType 101/105/107 - Ping
+      if (x == 14) /// Ping
       {
         SerialUSB.println(F("Received Ping"));
         char dat[128];
@@ -159,41 +132,7 @@ void loop() {
         pingCharacteristic.writeValue(dat);
         SerialUSB.println(dat);
       } 
-      if (x == 31) /// DevType 105 - Data
-      {
-        char dat[128];
-        struct data{
-            uint32_t datetime;
-            uint16_t locktime;
-            float lat;
-            float lng;
-            double pres;
-            float x;
-            float y;
-            float z;
-            byte hdop;
-        }__attribute__((__packed__)) d;
-
-        while (LoRa.available())
-          {
-            LoRa.readBytes((uint8_t*)&d, sizeof(d));
-          }
-          StaticJsonDocument<256> doc;
-          doc[F("Date")] = d.datetime;
-          doc[F("Lat")] = d.lat;
-          doc[F("Lng")] = d.lng;
-          doc[F("LckTm")] = d.locktime;
-          doc[F("hdop")] = d.hdop;
-          doc[F("Pres")] = d.pres;
-          doc[F("x")] = d.x;
-          doc[F("y")] = d.y;
-          doc[F("z")] = d.z;
-          
-          serializeJson(doc, dat);
-          dataCharacteristic.writeValue(dat);
-          SerialUSB.println(dat);
-      }
-      if (x == 16) /// DevType 107 - Data
+      if (x == 16) /// Data
         {
           char dat[128];
           struct data{
@@ -256,6 +195,13 @@ void loop() {
           s.gpsTout = doc["gtout"];
           s.hdop = doc["hdop"];
           s.radioFrq = doc["rf"];
+
+          LoRa.idle();
+          LoRa.beginPacket();
+          LoRa.write((uint8_t*)&s, sizeof(s));
+          LoRa.endPacket();
+          LoRa.sleep();
+
         }
                
       }
