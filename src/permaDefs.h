@@ -19,9 +19,13 @@ struct data{
     uint16_t locktime;
     float lat;
     float lng;
-    byte hdop;
-    byte id;
-    }__attribute__((__packed__));
+    float hdop;
+    float x;
+    float y;
+    float z;
+    unsigned int count;
+    uint16_t id;
+}__attribute__((__packed__));
 
 struct settings{
     uint16_t tag;
@@ -53,3 +57,14 @@ struct resPing{
     bool mortality;
   }__attribute__((__packed__));
     
+  struct calibrationData{
+      float lat;
+      float lng;
+      float hdop;
+      float bat;
+      float signal;
+      uint16_t tag;
+      bool mqtt;
+      bool gprs;
+      bool network;
+  }__attribute__((__packed__)); // Calibration Struct - Store GPS data during calibration.
