@@ -137,12 +137,13 @@ void loop() {
       }
       
       // Handle Ping (14 bytes)
-      if (x == 14) {
+      if (x == 16) {
         SerialUSB.println(F("Received Ping"));
         
         struct ping {
           uint16_t ta;
           uint16_t cnt;
+          uint16_t pid;
           float la;
           float ln;
           uint8_t devtyp;
@@ -161,6 +162,7 @@ void loop() {
         doc[F("cnt")] = p.cnt;
         doc[F("RSSI")] = LoRa.packetRssi();
         doc[F("Mort")] = p.mortality;
+        doc[F("Pid")] = p.pid;
         
         char dat[128];
         serializeJson(doc, dat);
@@ -215,7 +217,7 @@ void loop() {
         
         char dat[256];
         serializeJson(doc, dat);
-        dataCharacteristic.writeValue(dat);
+        pingCharacteristic.writeValue(dat);
         SerialUSB.println(dat);
       }
       
