@@ -1,4 +1,4 @@
-const char* tagID = "ArcTrack-Yagi-120";
+const char* tagID = "ArcTrack-Yagi";
 
 #define SCK     PA5    // GPIO5  -- SX1278's SCK
 #define MISO    PA6   // GPIO19 -- SX1278's MISO
